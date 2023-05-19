@@ -10,5 +10,5 @@ import (
 func main() {
 	log.Println("Service starting...")
 	http.HandleFunc("/random", engine.RandomCharHandler)
-	http.ListenAndServe(":9001", nil)
+	http.ListenAndServe(":8080", nil)
 }
