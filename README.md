@@ -14,4 +14,5 @@ As time goes on, expect more features!
 
 # Endpoints
 
-`/random` - the only supported endpoint as of v1.0, returns a JSON response with character stats and name. 
+`/random` - returns a JSON response with character stats and name. 
+`/weapon` - (WIP) this will generate a new enchanted weapon.

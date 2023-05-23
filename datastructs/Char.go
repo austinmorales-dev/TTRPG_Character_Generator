@@ -1,8 +1,9 @@
 package datastructs
 
 type Character struct {
-	Name  FullName `json:"Name"`
-	Stats Stats    `json:"Stats"`
+	Name      FullName `json:"Name"`
+	Stats     Stats    `json:"Stats"`
+	Alignment string   `json:"Alignment"`
 }
 
 type FullName struct {
