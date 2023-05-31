@@ -44,6 +44,7 @@ func GenChar() string {
 			CON: rand.Intn(12) + 1,
 		},
 		Alignment: GenAlignment(),
+		Class:     GenClass(),
 	}
 	return GenJson(char)
 }
@@ -120,4 +121,25 @@ func GenWeapon() *datastructs.Weapon {
 	weapon.DamageType = dt
 	weapon.Properties = props
 	return weapon
+}
+
+func GenClass() string {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	defer db.CloseDB()
+	class := db.GenerateClass()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	return class
+}
+
+func capFirst(word string) string {
+	splitWord := strings.Split(word, "")
+	splitWord[0] = strings.ToUpper(splitWord[0])
+	// f := append(splitWord, convFirst)
+	return strings.Join(splitWord, "")
 }

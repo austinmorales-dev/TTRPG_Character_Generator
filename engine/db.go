@@ -70,6 +70,14 @@ func (db *Database) GenerateAlignment() string {
 	return alignment
 }
 
+func (db *Database) GenerateClass() string {
+	var name string
+	query := "select name from classes order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&name)
+	db.QueryRowErr(err)
+	return name
+}
+
 func (db *Database) GenerateWeapon() (string, string, string, []string) {
 	var name, dt, dr string
 	var props []string

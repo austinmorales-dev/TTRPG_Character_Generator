@@ -5,6 +5,7 @@ type Character struct {
 	Stats     Stats    `json:"Stats"`
 	Race      string   `json:"Race"`
 	Alignment string   `json:"Alignment"`
+	Class     string   `json:"Class"`
 }
 
 type FullName struct {
