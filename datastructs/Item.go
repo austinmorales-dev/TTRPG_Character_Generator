@@ -1,7 +1,14 @@
 package datastructs
 
 type Weapon struct {
-	Name       string `json:"name"`
-	Damage     string `json:"damage"`
-	Properties string `json:"properties"`
+	Name         string      `json:"Name"`
+	DamageRoll   string      `json:"DamageRoll"`
+	DamageType   string      `json:"DamageType"`
+	Enchantments Enchantment `json:"Enchantments"`
+	Properties   []string    `json:"Properties"`
+}
+
+type Enchantment struct {
+	Name        string
+	Description string
 }

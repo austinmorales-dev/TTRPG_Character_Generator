@@ -14,5 +14,12 @@ As time goes on, expect more features!
 
 # Endpoints
 
-`/random` - returns a JSON response with character stats and name. 
-`/weapon` - (WIP) this will generate a new enchanted weapon.
+`/character` - returns a JSON response with character stats and name. 
+
+`/weapon` - this will generate a new enchanted/magic weapon.
+
+# Features roadmap:
+- Export generated characters to a character sheet via LaTeX (2.0)
+- ~~Generate random enchanted weapons (2.0)~~
+- Comission pixel art for generated items (funding needed)
+- Move over to new domain name (dungeongenius.com)

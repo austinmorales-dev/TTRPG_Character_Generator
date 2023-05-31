@@ -3,10 +3,8 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
@@ -21,38 +19,21 @@ func GenJson(obj any) string { //quick helper function to convert characters to 
 	return string(jsonResp)
 }
 
-func ImportNames() *datastructs.ImportedName {
-	jsonFile, err := os.Open("./etc/names.json")
-	if err != nil {
-		log.Fatal("Couldn't open JSON file...")
-	}
-	defer jsonFile.Close()
-
-	byteValue, _ := io.ReadAll(jsonFile)
-	var importedName datastructs.ImportedName
-	json.Unmarshal(byteValue, &importedName)
-
-	return &importedName
-}
-
 func GenChar() string {
 	rand.Seed(time.Now().UnixNano()) //seed the gen
-	var first_name string
-	var last_name string
-	name := ImportNames()
+	var first_name, last_name, race string
 	roll_d6 := rand.Intn(6) + 1 //just to stay in theme haha
 	if roll_d6 < 3 {
-		first_name = name.Human.FirstNames[rand.Intn(25)]
-		last_name = name.Human.LastNames[rand.Intn(25)]
+		first_name, last_name, race = GenName("human")
 	} else {
-		first_name = name.Elf.FirstNames[rand.Intn(25)]
-		last_name = name.Elf.LastNames[rand.Intn(25)]
+		first_name, last_name, race = GenName("elf")
 	}
 	char := datastructs.Character{
 		Name: datastructs.FullName{
 			FirstName: first_name,
 			LastName:  last_name,
 		},
+		Race: race,
 		Stats: datastructs.Stats{
 			HP:  rand.Intn(12) + 6,
 			STR: rand.Intn(12) + 1,
@@ -62,90 +43,103 @@ func GenChar() string {
 			WIS: rand.Intn(12) + 1,
 			CON: rand.Intn(12) + 1,
 		},
+		Alignment: GenAlignment(),
+		Class:     GenClass(),
 	}
 	return GenJson(char)
 }
 
-func GenDamage() string {
-	sides := []int{6, 8, 10, 12}
-	rand.Seed(time.Now().UnixNano())
-	amount := rand.Intn(2) + 1
-	dRoll := fmt.Sprintf("%vd%v", amount, sides[rand.Intn(len(sides))])
-	return dRoll
-}
-
-type ProtoWeapon struct {
-	Name       string
-	DamageType string
-}
-
 func GWeapon() string {
-	var genweap ProtoWeapon
-	var candidates []ProtoWeapon
-	rand.Seed(time.Now().UnixNano())
-	weaponNouns := []string{"Destruction",
-		"Annihilation",
-		"Doom",
-		"Justice",
-		"Shadows",
-		"Wrath",
-		"Chaos",
-		"Light",
-		"Darkness",
-		"Vengeance",
-		"Heroes",
-		"Souls",
-		"Power",
-		"Thunder",
-		"Frost",
-		"Flames",
-		"Life",
-		"Death",
-		"Dragons",
-		"Legends",
+	genweap := GenWeapon()
+	eName, eDesc, eWeapName := GenEnchantment()
+	fullTitle := strings.ToTitle(fmt.Sprintf("%v of %v", genweap.Name, eWeapName))
+	genweap.Name = fullTitle
+	genweap.Enchantments = datastructs.Enchantment{
+		Name:        eName,
+		Description: eDesc,
 	}
-	meleeDT := []string{"slashing", "bludgeoning"}
-	rangedDT := []string{"piercing"}
-	// magicDT := []string{"cold", "poison", "fire", "acid", "psychic", "necrotic", "radiant", "force", "thunder", "lightning"}
+	return GenJson(genweap)
+}
 
-	weapons := []ProtoWeapon{
-		{Name: "axe", DamageType: meleeDT[0]},
-		{Name: "sword", DamageType: meleeDT[0]},
-		{Name: "warhammer", DamageType: meleeDT[1]},
-		{Name: "club", DamageType: meleeDT[1]},
-		{Name: "quarterstaff", DamageType: meleeDT[1]},
-		{Name: "shield", DamageType: meleeDT[1]},
-		{Name: "bow", DamageType: rangedDT[0]},
-		{Name: "short bow", DamageType: rangedDT[0]},
-		{Name: "dart", DamageType: rangedDT[0]},
-		{Name: "crossbow", DamageType: rangedDT[0]},
+func GenEnchantment() (string, string, string) {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
 	}
+	defer db.CloseDB()
+	e_name, e_desc, eWeapName, err := db.GenerateEnchantment()
+	if err != nil {
+		log.Println("Failed to generate from table: ", err)
+	}
+	return e_name, e_desc, eWeapName
+}
 
-	d6roll := rand.Intn(6) + 1
-	if d6roll > 3 {
-		for _, weapon := range weapons {
-			if weapon.DamageType == meleeDT[0] || weapon.DamageType == meleeDT[1] {
-				candidates = append(candidates, weapon)
-			}
-		}
-	} else {
-		for _, weapon := range weapons {
-			if weapon.DamageType == rangedDT[0] {
-				candidates = append(candidates, weapon)
-			}
-		}
+func GenName(r string) (string, string, string) {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	defer db.CloseDB()
+	fName, lName, race, err := db.GenerateNames(r)
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	return fName, lName, race
+}
 
+func GenAlignment() string {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
 	}
-	if len(candidates) > 0 {
-		genweap = candidates[rand.Intn(len(candidates))]
+	defer db.CloseDB()
+	alignment := db.GenerateAlignment()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
 	}
-	randNoun := weaponNouns[rand.Intn(len(weaponNouns))]
-	fullTitle := strings.ToTitle(fmt.Sprintf("%v of %v", genweap.Name, randNoun))
+	return alignment
+}
 
-	weapon := datastructs.Weapon{
-		Name:       fullTitle,
-		Damage:     GenDamage(),
-		Properties: genweap.DamageType,
+func GenWeapon() *datastructs.Weapon {
+	weapon := &datastructs.Weapon{}
+	var props []string
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
 	}
-	return GenJson(weapon)
+	defer db.CloseDB()
+	name, dt, dr, props := db.GenerateWeapon()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	weapon.Name = name
+	weapon.DamageRoll = dr
+	weapon.DamageType = dt
+	weapon.Properties = props
+	return weapon
+}
+
+func GenClass() string {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	defer db.CloseDB()
+	class := db.GenerateClass()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	return class
+}
+
+func capFirst(word string) string {
+	splitWord := strings.Split(word, "")
+	splitWord[0] = strings.ToUpper(splitWord[0])
+	// f := append(splitWord, convFirst)
+	return strings.Join(splitWord, "")
 }

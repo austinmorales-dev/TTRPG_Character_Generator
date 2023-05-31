@@ -44,6 +44,49 @@ func (db *Database) GenerateFromDB(table string) (string, error) {
 	return generatedValue, nil
 }
 
+func (db *Database) GenerateEnchantment() (string, string, string, error) {
+	var enchantmentName, enchantmentDesc, enchantmentWeaponName string
+
+	query := "SELECT name, description,name_for_weapon FROM enchantments ORDER BY random() LIMIT 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&enchantmentName, &enchantmentDesc, &enchantmentWeaponName)
+	db.QueryRowErr(err)
+	// vals :=
+	return enchantmentName, enchantmentDesc, enchantmentWeaponName, nil
+}
+
+func (db *Database) GenerateNames(r string) (string, string, string, error) {
+	var fName, lName, race string
+	query := fmt.Sprintf("select firstname, lastname, race from names where race='%s' order by random() limit 1;", r)
+	err := db.conn.QueryRow(context.Background(), query).Scan(&fName, &lName, &race)
+	db.QueryRowErr(err)
+	return fName, lName, race, nil
+}
+
+func (db *Database) GenerateAlignment() string {
+	var alignment string
+	query := "select alignment from alignments order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&alignment)
+	db.QueryRowErr(err)
+	return alignment
+}
+
+func (db *Database) GenerateClass() string {
+	var name string
+	query := "select name from classes order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&name)
+	db.QueryRowErr(err)
+	return name
+}
+
+func (db *Database) GenerateWeapon() (string, string, string, []string) {
+	var name, dt, dr string
+	var props []string
+	query := "select name, damage_type, damage_roll, properties from weapons order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&name, &dt, &dr, &props)
+	db.QueryRowErr(err)
+	return name, dt, dr, props
+}
+
 func (db *Database) GetTotalRows(table string) (int, error) {
 	var totalnum int
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %v;", table)
