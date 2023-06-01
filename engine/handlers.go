@@ -18,3 +18,10 @@ func GenWeaponHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	io.WriteString(w, weapon)
 }
+
+func GenNPCHandler(w http.ResponseWriter, r *http.Request) {
+	npc := GenTestMon()
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Content-Type", "application/json")
+	io.WriteString(w, GenJson(npc))
+}

@@ -123,6 +123,78 @@ func GenWeapon() *datastructs.Weapon {
 	return weapon
 }
 
+func GenTestMon() *datastructs.Monster {
+	mon := &datastructs.Monster{
+		ID: datastructs.IDProps{
+			Name:         "Ancient Black Dragon",
+			CreatureType: "Dragon",
+			Size:         "Gargantuan",
+			Alignment:    "Chaotic evil",
+		},
+		CProps: datastructs.CombatProps{
+			AC: datastructs.StrInt{
+				Name:  "Natural Armor",
+				Value: 22,
+			},
+			Statblock: datastructs.Stats{
+				HP:  rand.Intn(20) + 6,
+				STR: rand.Intn(20) + 6,
+				CHA: rand.Intn(20) + 6,
+				INT: rand.Intn(20) + 6,
+				DEX: rand.Intn(20) + 6,
+				WIS: rand.Intn(20) + 6,
+				CON: rand.Intn(20) + 6,
+			},
+			Movement: []datastructs.StrInt{
+				{Name: "Speed", Value: 40},
+				{Name: "Fly", Value: 80},
+				{Name: "Swim", Value: 40},
+			},
+		},
+		Attr: datastructs.Attributes{
+			SavingThrows: []datastructs.StrInt{
+				{Name: "DEX", Value: 9},
+				{Name: "CON", Value: 14},
+				{Name: "WIS", Value: 9},
+				{Name: "CHA", Value: 11},
+			},
+			Skills: []datastructs.StrInt{
+				{Name: "Perception", Value: 16},
+				{Name: "Stealth", Value: 9},
+			},
+			DamageImmunities: []string{
+				"acid",
+			},
+			Senses: []datastructs.StrInt{
+				{Name: "blindsight", Value: 60},
+				{Name: "darkvision", Value: 120},
+				{Name: "passive Perception", Value: 26},
+			},
+			Languages: []string{
+				"common",
+				"draconic",
+			},
+			Challenge: datastructs.Challenge{
+				Value: 20,
+				XP:    33000,
+			},
+		},
+		SpecTraits: []datastructs.DString{
+			{Name: "Amphibious", Desc: "Can breath water and air"},
+			{Name: "Legendary Resistance", Desc: "If this fails a saving throw, it can choose to succeed instead."},
+		},
+		Actions: []datastructs.DString{
+			{Name: "Multiattack", Desc: "Can attack once with it's bite, and twice with it's claws."},
+			{Name: "Bite", Desc: "Melee Weapon Attack, +15 to hit, reach 15ft."},
+			{Name: "Claw", Desc: "Melee Weapon Attack, +15 to hit, reach 10ft."},
+		},
+		LActions: []datastructs.DString{
+			{Name: "Detect", Desc: "Make a Widsom (Perception) check."},
+		},
+	}
+	return mon
+}
+
 func GenClass() string {
 	db := &Database{}
 	err := db.ConnectToDB()

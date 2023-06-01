@@ -18,8 +18,22 @@ As time goes on, expect more features!
 
 `/weapon` - this will generate a new enchanted/magic weapon.
 
+`/npc` - returns a monster/NPC statblock
+
+
+# Environment Variables
+`$DB_URL` = the URL to the PostgreSQL DB
+`$PORTNO` = the port number for the server to run on
+
+
 # Features roadmap:
-- Export generated characters to a character sheet via LaTeX (2.0)
-- ~~Generate random enchanted weapons (2.0)~~
-- Comission pixel art for generated items (funding needed)
+
+## 2.0:
+- Export generated characters to a character sheet via LaTeX
+- ~~Generate random enchanted weapons~~
+- Generate random NPCs/Monsters from DB
 - Move over to new domain name (dungeongenius.com)
+
+
+## To Infinity (And Beyond...)
+- Comission pixel art for generated items (funding needed)

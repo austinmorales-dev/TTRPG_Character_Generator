@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"time"
@@ -17,9 +18,10 @@ type Database struct {
 func (db *Database) ConnectToDB() error {
 	dbpool, err := pgxpool.New(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "Unable to create connection pool: %v", err)
-		os.Exit(1)
+		log.Println("Unable to create connection pool: ", err)
+		return err
 	}
+
 	db.conn = dbpool
 	return nil
 }
