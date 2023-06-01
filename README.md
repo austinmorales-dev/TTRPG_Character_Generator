@@ -19,6 +19,7 @@ To get this running on your own hardware, just make sure you have the latest ver
 
 # Environment Variables
 `$DB_URL` = the URL to the PostgreSQL DB
+
 `$PORTNO` = the port number for the server to run on
 
 

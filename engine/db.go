@@ -21,8 +21,12 @@ func (db *Database) ConnectToDB() error {
 		log.Println("Unable to create connection pool: ", err)
 		return err
 	}
-
 	db.conn = dbpool
+	err = db.conn.Ping(context.Background())
+	if err != nil {
+		log.Println("Unable to ping DB: ", err)
+		return err
+	}
 	return nil
 }
 
