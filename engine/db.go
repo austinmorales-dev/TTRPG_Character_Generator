@@ -60,12 +60,12 @@ func (db *Database) GenerateEnchantment() (string, string, string, error) {
 	return enchantmentName, enchantmentDesc, enchantmentWeaponName, nil
 }
 
-func (db *Database) GenerateNames(r string) (string, string, string, error) {
-	var fName, lName, race string
-	query := fmt.Sprintf("select firstname, lastname, race from names where race='%s' order by random() limit 1;", r)
-	err := db.conn.QueryRow(context.Background(), query).Scan(&fName, &lName, &race)
+func (db *Database) GenerateNames(r string) (string, string, error) {
+	var fName, lName string
+	query := fmt.Sprintf("select fname, lname from names where LOWER(race)='%v' order by random() limit 1;", r)
+	err := db.conn.QueryRow(context.Background(), query).Scan(&fName, &lName)
 	db.QueryRowErr(err)
-	return fName, lName, race, nil
+	return fName, lName, nil
 }
 
 func (db *Database) GenerateAlignment() string {
@@ -76,12 +76,30 @@ func (db *Database) GenerateAlignment() string {
 	return alignment
 }
 
-func (db *Database) GenerateClass() string {
-	var name string
-	query := "select name from classes order by random() limit 1;"
-	err := db.conn.QueryRow(context.Background(), query).Scan(&name)
+func (db *Database) GenerateRace() (string, string, []int) {
+	var race, subrace string
+	var mods []int
+	query := "select name, subrace, mods from races order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&race, &subrace, &mods)
 	db.QueryRowErr(err)
-	return name
+	return race, subrace, mods
+}
+
+func (db *Database) GenerateBackground() string {
+	var alignment string
+	query := "select name from backgrounds order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&alignment)
+	db.QueryRowErr(err)
+	return alignment
+}
+
+func (db *Database) GenerateClass() (string, int) {
+	var name string
+	var baseHP int
+	query := "select name, hitdie from classes order by random() limit 1;"
+	err := db.conn.QueryRow(context.Background(), query).Scan(&name, &baseHP)
+	db.QueryRowErr(err)
+	return name, baseHP
 }
 
 func (db *Database) GenerateWeapon() (string, string, string, []string) {

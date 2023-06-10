@@ -1,11 +1,12 @@
 package datastructs
 
 type Character struct {
-	Name      FullName `json:"Name"`
-	Stats     Stats    `json:"Stats"`
-	Race      string   `json:"Race"`
-	Alignment string   `json:"Alignment"`
-	Class     string   `json:"Class"`
+	Name       FullName `json:"Name"`
+	Stats      Stats    `json:"Stats"`
+	Race       string   `json:"Race"`
+	Alignment  string   `json:"Alignment"`
+	Class      string   `json:"Class"`
+	Background string   `json:"Background"`
 }
 
 type FullName struct {
@@ -14,13 +15,19 @@ type FullName struct {
 }
 
 type Stats struct {
-	HP  int `json:"HP"`
-	STR int `json:"STR"`
-	DEX int `json:"DEX"`
-	CON int `json:"CON"`
-	WIS int `json:"WIS"`
-	CHA int `json:"CHA"`
-	INT int `json:"INT"`
+	HP     int `json:"HP"`
+	STR    int `json:"STR"`
+	STRmod int `json:"STRm"`
+	DEX    int `json:"DEX"`
+	DEXmod int `json:"DEXm"`
+	CON    int `json:"CON"`
+	CONmod int `json:"CONm"`
+	INT    int `json:"INT"`
+	INTmod int `json:"INTm"`
+	WIS    int `json:"WIS"`
+	WISmod int `json:"WISm"`
+	CHA    int `json:"CHA"`
+	CHAmod int `json:"CHAm"`
 }
 
 type ImportedName struct {

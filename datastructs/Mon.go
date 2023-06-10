@@ -1,12 +1,12 @@
 package datastructs
 
-type Monster struct {
+type Statblock struct {
 	ID         IDProps     `json:"ID"`
 	CProps     CombatProps `json:"CProps"`
 	Attr       Attributes  `json:"Attributes"`
 	SpecTraits []DString   `json:"SpecialTraits"`
 	Actions    []DString   `json:"Actions"`
-	LActions   []DString   `json:"LActions"`
+	LActions   []DString   `json:"LActions,omitempty"`
 }
 
 type IDProps struct {
@@ -17,17 +17,17 @@ type IDProps struct {
 }
 
 type CombatProps struct {
-	AC        StrInt   `json:"AC"`
-	Statblock Stats    `json:"Stats"`
-	Movement  []StrInt `json:"Movement"`
+	AC       StrInt   `json:"AC"`
+	Stats    Stats    `json:"Stats"`
+	Movement []StrInt `json:"Movement"`
 }
 
 type Attributes struct {
 	SavingThrows        []StrInt  `json:"SavingThrows"`
 	Skills              []StrInt  `json:"Skills"`
-	DamageImmunities    []string  `json:"DamageImmunities"`
-	ConditionImmunities []string  `json:"ConditionImmunities"`
-	DamageResistances   []string  `json:"DamageResistances"`
+	DamageImmunities    []string  `json:"DamageImmunities,omitempty"`
+	ConditionImmunities []string  `json:"ConditionImmunities,omitempty"`
+	DamageResistances   []string  `json:"DamageResistances,omitempty"`
 	Senses              []StrInt  `json:"Senses"`
 	Languages           []string  `json:"Languages"`
 	Challenge           Challenge `json:"Challenge"`

@@ -21,30 +21,27 @@ func GenJson(obj any) string { //quick helper function to convert characters to 
 
 func GenChar() string {
 	rand.Seed(time.Now().UnixNano()) //seed the gen
-	var first_name, last_name, race string
-	roll_d6 := rand.Intn(6) + 1 //just to stay in theme haha
-	if roll_d6 < 3 {
-		first_name, last_name, race = GenName("human")
-	} else {
-		first_name, last_name, race = GenName("elf")
+	class, baseHP := GenClass()
+	race, subrace, mods := GenRace()
+	stats := GenerateStats(baseHP)
+	// fmt.Println(stats)
+	rm_stats := ApplyRaceMods(mods, stats)
+	// fmt.Println(rm_stats)
+	// fmt.Println(mods)
+	first_name, last_name := GenName(race)
+	if subrace != "" {
+		race = fmt.Sprintf("%v %v", subrace, race)
 	}
 	char := datastructs.Character{
 		Name: datastructs.FullName{
 			FirstName: first_name,
 			LastName:  last_name,
 		},
-		Race: race,
-		Stats: datastructs.Stats{
-			HP:  rand.Intn(12) + 6,
-			STR: rand.Intn(12) + 1,
-			CHA: rand.Intn(12) + 1,
-			INT: rand.Intn(12) + 1,
-			DEX: rand.Intn(12) + 1,
-			WIS: rand.Intn(12) + 1,
-			CON: rand.Intn(12) + 1,
-		},
-		Alignment: GenAlignment(),
-		Class:     GenClass(),
+		Race:       race,
+		Stats:      *rm_stats,
+		Alignment:  GenFeature("alignment"),
+		Class:      class,
+		Background: GenFeature("background"),
 	}
 	return GenJson(char)
 }
@@ -75,32 +72,60 @@ func GenEnchantment() (string, string, string) {
 	return e_name, e_desc, eWeapName
 }
 
-func GenName(r string) (string, string, string) {
+func GenClass() (string, int) {
 	db := &Database{}
 	err := db.ConnectToDB()
 	if err != nil {
 		log.Println("Failed to connect to DB: ", err)
 	}
 	defer db.CloseDB()
-	fName, lName, race, err := db.GenerateNames(r)
-	if err != nil {
-		log.Println("Failed to connect to DB: ", err)
-	}
-	return fName, lName, race
+	class, baseHP := db.GenerateClass()
+	return class, baseHP
 }
 
-func GenAlignment() string {
+func GenRace() (string, string, []int) {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("failed to connected to db:", err)
+	}
+	defer db.CloseDB()
+	name, subrace, mods := db.GenerateRace()
+	return name, subrace, mods
+}
+
+func GenName(r string) (string, string) {
 	db := &Database{}
 	err := db.ConnectToDB()
 	if err != nil {
 		log.Println("Failed to connect to DB: ", err)
 	}
 	defer db.CloseDB()
-	alignment := db.GenerateAlignment()
+	fName, lName, err := db.GenerateNames(r)
 	if err != nil {
 		log.Println("Failed to connect to DB: ", err)
 	}
-	return alignment
+	return fName, lName
+}
+
+func GenFeature(query string) string {
+	db := &Database{}
+	err := db.ConnectToDB()
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	defer db.CloseDB()
+	switch query {
+	case "alignment":
+		return db.GenerateAlignment()
+	case "background":
+		return db.GenerateBackground()
+	}
+
+	if err != nil {
+		log.Println("Failed to connect to DB: ", err)
+	}
+	return ""
 }
 
 func GenWeapon() *datastructs.Weapon {
@@ -123,8 +148,8 @@ func GenWeapon() *datastructs.Weapon {
 	return weapon
 }
 
-func GenTestMon() *datastructs.Monster {
-	mon := &datastructs.Monster{
+func GenTestMon() *datastructs.Statblock {
+	mon := &datastructs.Statblock{
 		ID: datastructs.IDProps{
 			Name:         "Ancient Black Dragon",
 			CreatureType: "Dragon",
@@ -136,14 +161,14 @@ func GenTestMon() *datastructs.Monster {
 				Name:  "Natural Armor",
 				Value: 22,
 			},
-			Statblock: datastructs.Stats{
-				HP:  rand.Intn(20) + 6,
-				STR: rand.Intn(20) + 6,
-				CHA: rand.Intn(20) + 6,
-				INT: rand.Intn(20) + 6,
-				DEX: rand.Intn(20) + 6,
-				WIS: rand.Intn(20) + 6,
-				CON: rand.Intn(20) + 6,
+			Stats: datastructs.Stats{
+				HP:  RollAbility(),
+				STR: RollAbility(),
+				CHA: RollAbility(),
+				INT: RollAbility(),
+				DEX: RollAbility(),
+				WIS: RollAbility(),
+				CON: RollAbility(),
 			},
 			Movement: []datastructs.StrInt{
 				{Name: "Speed", Value: 40},
@@ -193,25 +218,4 @@ func GenTestMon() *datastructs.Monster {
 		},
 	}
 	return mon
-}
-
-func GenClass() string {
-	db := &Database{}
-	err := db.ConnectToDB()
-	if err != nil {
-		log.Println("Failed to connect to DB: ", err)
-	}
-	defer db.CloseDB()
-	class := db.GenerateClass()
-	if err != nil {
-		log.Println("Failed to connect to DB: ", err)
-	}
-	return class
-}
-
-func capFirst(word string) string {
-	splitWord := strings.Split(word, "")
-	splitWord[0] = strings.ToUpper(splitWord[0])
-	// f := append(splitWord, convFirst)
-	return strings.Join(splitWord, "")
 }
